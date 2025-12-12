@@ -4,7 +4,30 @@ plugins {
 }
 
 group = 'fr.sandro642.orbit'
-version = '1.0-SNAPSHOT'
+version = '0.1.0'
+
+task generateVersionClass {
+    doLast {
+        def versionFile = file("$buildDir/generated/source/version/fr/sandro642/orbit/update/Version.java")
+        versionFile.parentFile.mkdirs()
+        versionFile.text = """
+package fr.sandro642.orbit.update;
+
+public class Version {
+    public static final String VERSION = "${project.version}";
+}
+"""
+    }
+}
+
+compileJava.dependsOn generateVersionClass
+sourceSets.main.java.srcDir "$buildDir/generated/source/version"
+
+tasks.register('printVersion') {
+    doLast {
+        println project.version
+    }
+}
 
 repositories {
     mavenCentral()
@@ -16,6 +39,7 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     implementation 'io.projectreactor:reactor-core:3.6.9'
+    implementation 'com.google.code.gson:gson:2.10.1'
 }
 
 application {
