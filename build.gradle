@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'fr.sandro642.orbit'
-version = '0.1.0'
+version = '0.2.0'
 
 task generateVersionClass {
     doLast {
