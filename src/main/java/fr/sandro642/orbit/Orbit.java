@@ -9,7 +9,7 @@ public class Orbit extends OrbitHelper {
     private static final Orbit INSTANCE = new Orbit();
 
     // GITHUB API URL REPOSITORY INTEGRATION*
-    private final String GITHUB_API_URL = "https://api.github.com/repos/Sandro642/Orbit/commits\\?per_page\\=1";
+    private final String GITHUB_API_URL = "https://api.github.com/repos/Sandro642/Orbit/commits";
 
     public static void main(String[] args) {
         // 1. Get the latest commit hash from the GitHub API
