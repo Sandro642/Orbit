@@ -2,6 +2,7 @@ package fr.sandro642.orbit;
 
 import fr.sandro642.orbit.log.Logger;
 import fr.sandro642.orbit.log.Logs;
+import fr.sandro642.orbit.update.core.Updater;
 
 public class Orbit extends OrbitHelper {
 
@@ -9,6 +10,7 @@ public class Orbit extends OrbitHelper {
     private static final Orbit INSTANCE = new Orbit();
 
     public static void main(String[] args) {
+        INSTANCE.getUpdater().checkForUpdates();
     }
 
     // Get the singleton instance of Orbit
@@ -32,5 +34,9 @@ public class Orbit extends OrbitHelper {
      */
     public Logs getLogs() {
         return Logs.getLogsSingleton();
+    }
+
+    public Updater getUpdater() {
+        return Updater.getUpdaterSingleton();
     }
 }
