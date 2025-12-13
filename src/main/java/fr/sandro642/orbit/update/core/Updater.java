@@ -4,11 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import fr.sandro642.orbit.Orbit;
 import fr.sandro642.orbit.update.Version;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
-import reactor.core.scheduler.Schedulers;
 
+import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.net.http.HttpClient;
@@ -38,6 +37,8 @@ public class Updater {
 
             if (isLatestVersion() == true) {
                 downloadFile("https://github.com/Sandro642/sandro642.github.io/blob/main/orbit/jar/fr/sandro642/orbit/Orbit/" + fetchVersion() + "/Orbit-" + fetchVersion() + "-fat.jar", FolderParent.toString() + "/Orbit-" + fetchVersion() + ".jar");
+
+                removeAndStartNewVersion();
             }
 
         } catch (Exception exception) {
@@ -47,11 +48,18 @@ public class Updater {
 
     private String fetchVersion() {
         try {
+            final String PAT_KEY = "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";
+            final String API_URL = "https://api.github.com/repos/Sandro642/Orbit/tags";
+
             statusBarProgress = 2;
+
+            String authorizationHeader = "Bearer " + PAT_KEY;
 
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://api.github.com/repos/Sandro642/Orbit/tags"))
+                    .uri(URI.create(API_URL))
+                    .header("Authorization", authorizationHeader)
+                    .GET()
                     .build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -92,33 +100,85 @@ public class Updater {
             statusBarProgress = 4;
 
             URL url = new URL(urlStr);
-            ReadableByteChannel rbc = Channels.newChannel(url.openStream());
 
-            FileOutputStream fos = new FileOutputStream(filePath);
-            fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-            fos.close();
-            rbc.close();
+            try (ReadableByteChannel rbc = Channels.newChannel(url.openStream());
+                 FileOutputStream fos = new FileOutputStream(filePath)) {
+
+                long bytesTransferred = fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+
+                fos.flush();
+                fos.getFD().sync();
+
+                System.out.println("Downloaded " + bytesTransferred + " bytes to " + filePath);
+            }
+
+            Thread.sleep(500);
+
+            File downloadedFile = new File(filePath);
+            if (!downloadedFile.exists() || downloadedFile.length() == 0) {
+                throw new IOException("Download failed: file is missing or empty");
+            }
+
+            System.out.println("File downloaded successfully: " + downloadedFile.length() + " bytes");
+
         } catch (Exception exception) {
-            Orbit.getInstance().getLogger().ERROR(exception.getMessage());
+            exception.printStackTrace();
+            Orbit.getInstance().getLogger().ERROR("Download error: " + exception.getMessage());
+
+            // Supprimer le fichier corrompu s'il existe
+            File file = new File(filePath);
+            if (file.exists()) {
+                file.delete();
+            }
         }
     }
 
-    private Mono<Void> removeAndStartNewVersion() {
-        return Mono.fromRunnable(() -> {
-            try {
-                Class<?> classReference = Updater.class;
+    private void removeAndStartNewVersion() {
+        try {
+            Class<?> classReference = Updater.class;
 
-                URL url = classReference.getProtectionDomain().getCodeSource().getLocation();
+            URL url = classReference.getProtectionDomain().getCodeSource().getLocation();
 
-                Path filePath = Paths.get(url.toURI());
-                Path FolderParent = filePath.getParent();
+            Path filePath = Paths.get(url.toURI());
+            Path FolderParent = filePath.getParent();
 
-                String LOCAL_JAR = FolderParent.toString() + "/Orbit-" + fetchVersion() + ".jar";
+            File LOCAL_JAR = new File(FolderParent.toString() + "/Orbit-" + Version.VERSION + ".jar");
+            String newJarPath = FolderParent + "/Orbit-" + fetchVersion() + ".jar";
 
-            } catch (Exception exception) {
-                Orbit.getInstance().getLogger().ERROR(exception.getMessage());
+            System.out.println("Starting new version...");
+            System.out.println("Current JAR: " + LOCAL_JAR.getAbsolutePath());
+            System.out.println("New JAR: " + newJarPath);
+            System.out.println("Command: java -jar " + newJarPath + " --delete-old " + LOCAL_JAR.getAbsolutePath());
+
+            ProcessBuilder pb = new ProcessBuilder(
+                    "java",
+                    "-jar",
+                    newJarPath,
+                    "--delete-old",
+                    LOCAL_JAR.getAbsolutePath()
+            );
+
+            // IMPORTANT : Rediriger les sorties pour voir les erreurs
+            pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+            pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+
+            Process process = pb.start();
+
+            // Attendre un peu et vérifier si le processus tourne toujours
+            Thread.sleep(2000);
+
+            if (process.isAlive()) {
+                System.out.println("New version is running successfully!");
+                System.exit(0);
+            } else {
+                System.err.println("ERROR: New process exited with code: " + process.exitValue());
+                System.err.println("The new version failed to start. Check the output above.");
             }
-        }).subscribeOn(Schedulers.boundedElastic()).then();
+
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            Orbit.getInstance().getLogger().ERROR(exception.getMessage());
+        }
     }
 
     public static Updater getUpdaterSingleton() {
