@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'application'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 group = 'fr.sandro642.orbit'
@@ -29,6 +30,15 @@ tasks.register('printVersion') {
     }
 }
 
+shadowJar {
+    archiveClassifier.set('fat')
+
+
+    manifest {
+        attributes 'Main-Class': 'fr.sandro642.orbit.Orbit'
+    }
+}
+
 repositories {
     mavenCentral()
 }
@@ -40,6 +50,7 @@ dependencies {
 
     implementation 'io.projectreactor:reactor-core:3.6.9'
     implementation 'com.google.code.gson:gson:2.10.1'
+    implementation("org.eclipse.jgit:org.eclipse.jgit:6.10.0.202406032230-r")
 }
 
 application {
