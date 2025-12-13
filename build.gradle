@@ -32,7 +32,7 @@ tasks.register('printVersion') {
 }
 
 shadowJar {
-    archiveClassifier.set('')
+    archiveClassifier.set('fat')
 
 
     manifest {
