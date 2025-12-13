@@ -2,25 +2,13 @@ package fr.sandro642.orbit;
 
 import fr.sandro642.orbit.log.Logger;
 import fr.sandro642.orbit.log.Logs;
-import fr.sandro642.orbit.update.core.Updater;
 
 public class Orbit extends OrbitHelper {
 
     // Make an instance of Orbit
     private static final Orbit INSTANCE = new Orbit();
 
-    // GITHUB API URL REPOSITORY INTEGRATION*
-    private final String GITHUB_API_URL = "https://api.github.com/repos/Sandro642/Orbit/commits";
-
     public static void main(String[] args) {
-        // 1. Get the latest commit hash from the GitHub API
-        //INSTANCE.getLatestHashCommit(INSTANCE.GITHUB_API_URL);
-
-        INSTANCE.getUpdater().GitAutomationMain();
-
-        System.out.println("Latest Local Commit Hash: " + INSTANCE.getUpdater().latestCommitHashLocal);
-
-
     }
 
     // Get the singleton instance of Orbit
@@ -44,9 +32,5 @@ public class Orbit extends OrbitHelper {
      */
     public Logs getLogs() {
         return Logs.getLogsSingleton();
-    }
-
-    public Updater getUpdater() {
-        return Updater.getUpdaterSingleton();
     }
 }

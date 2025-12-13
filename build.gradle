@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'application'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'maven-publish'
 }
 
 group = 'fr.sandro642.orbit'
@@ -50,7 +51,7 @@ dependencies {
 
     implementation 'io.projectreactor:reactor-core:3.6.9'
     implementation 'com.google.code.gson:gson:2.10.1'
-    implementation("org.eclipse.jgit:org.eclipse.jgit:6.10.0.202406032230-r")
+    implementation 'org.eclipse.jgit:org.eclipse.jgit:6.10.0.202406032230-r'
 }
 
 application {
@@ -70,4 +71,49 @@ tasks.test {
 
 test {
     useJUnitPlatform()
+}
+
+java {
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            groupId = project.group.toString()
+            artifactId = 'Orbit'
+            version = project.version.toString()
+            pom {
+                name = 'Orbit'
+                description = 'Everything revolves around you. Trading has never been simpler, at least on the desktop.'
+                url = 'https://sandro642.github.io/Orbit/'
+                licenses {
+                    license {
+                        name = 'GPL-3.0'
+                        url = 'https://github.com/Sandro642/Orbit/blob/main/LICENSE'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'sandro642'
+                        name = 'Sandro'
+                        email = 'sandro33810@gmail.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/sandro642/Orbit.git'
+                    developerConnection = 'scm:git:ssh://github.com/sandro642/Orbit.git'
+                    url = 'https://github.com/sandro642/Orbit'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = 'LocalRepo'
+            url = uri(layout.buildDirectory.dir('repo'))
+        }
+    }
 }
