@@ -48,7 +48,7 @@ public class Updater {
 
     private String fetchVersion() {
         try {
-            final String PAT_KEY = "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";
+            //final String PAT_KEY = "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";
             final String API_URL = "https://api.github.com/repos/Sandro642/Orbit/tags";
 
             statusBarProgress = 2;
