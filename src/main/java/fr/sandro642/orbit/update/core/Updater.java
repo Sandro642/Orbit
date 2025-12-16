@@ -36,7 +36,7 @@ public class Updater {
             Path FolderParent = filePath.getParent();
 
             if (isLatestVersion() == true) {
-                downloadFile("https://github.com/Sandro642/sandro642.github.io/blob/main/orbit/jar/fr/sandro642/orbit/Orbit/" + fetchVersion() + "/Orbit-" + fetchVersion() + "-fat.jar", FolderParent.toString() + "/Orbit-" + fetchVersion() + ".jar");
+                downloadFile("https://raw.githubusercontent.com/Sandro642/sandro642.github.io/main/orbit/jar/fr/sandro642/orbit/Orbit/" + fetchVersion() + "/Orbit-" + fetchVersion() + "-fat.jar", FolderParent.toString() + "/Orbit-" + fetchVersion() + ".jar");
 
                 removeAndStartNewVersion();
             }
@@ -48,7 +48,7 @@ public class Updater {
 
     private String fetchVersion() {
         try {
-            final String PAT_KEY = "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";
+            final String PAT_KEY = "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";
             final String API_URL = "https://api.github.com/repos/Sandro642/Orbit/tags";
 
             statusBarProgress = 2;
@@ -58,7 +58,7 @@ public class Updater {
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(API_URL))
-                    .header("Authorization", authorizationHeader)
+                    //.header("Authorization", authorizationHeader)
                     .GET()
                     .build();
 
