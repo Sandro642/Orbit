@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import fr.sandro642.orbit.Orbit;
 import fr.sandro642.orbit.update.Version;
+import fr.sandro642.orbit.update.ui.Frame;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,6 +29,8 @@ public class Updater {
         try {
             statusBarProgress = 1;
 
+            Orbit.getInstance().getFrame().init();
+
             Class<?> classReference = Updater.class;
 
             URL url = classReference.getProtectionDomain().getCodeSource().getLocation();
@@ -35,10 +38,16 @@ public class Updater {
             Path filePath = Paths.get(url.toURI());
             Path FolderParent = filePath.getParent();
 
-            if (isLatestVersion() == true) {
+            if (isLatestVersion()) {
                 downloadFile("https://raw.githubusercontent.com/Sandro642/sandro642.github.io/main/orbit/jar/fr/sandro642/orbit/Orbit/" + fetchVersion() + "/Orbit-" + fetchVersion() + "-fat.jar", FolderParent.toString() + "/Orbit-" + fetchVersion() + ".jar");
 
                 removeAndStartNewVersion();
+            } else {
+                statusBarProgress = 5;
+
+                Orbit.getInstance().getLogger().INFO("Fermeture.");
+
+                Thread.sleep(200000);
             }
 
         } catch (Exception exception) {
@@ -48,12 +57,9 @@ public class Updater {
 
     private String fetchVersion() {
         try {
-
             final String API_URL = "https://api.github.com/repos/Sandro642/Orbit/tags";
 
             statusBarProgress = 2;
-
-
 
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
@@ -135,6 +141,8 @@ public class Updater {
 
     private void removeAndStartNewVersion() {
         try {
+            statusBarProgress = 5;
+
             Class<?> classReference = Updater.class;
 
             URL url = classReference.getProtectionDomain().getCodeSource().getLocation();

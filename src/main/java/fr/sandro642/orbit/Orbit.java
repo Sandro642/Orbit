@@ -3,6 +3,7 @@ package fr.sandro642.orbit;
 import fr.sandro642.orbit.log.Logger;
 import fr.sandro642.orbit.log.Logs;
 import fr.sandro642.orbit.update.core.Updater;
+import fr.sandro642.orbit.update.ui.Frame;
 
 import java.io.File;
 
@@ -61,7 +62,21 @@ public class Orbit extends OrbitHelper {
         return Logs.getLogsSingleton();
     }
 
+    /**
+     * Get the singleton instance of Updater
+     *
+     * @return Updater instance
+     */
     public Updater getUpdater() {
         return Updater.getUpdaterSingleton();
+    }
+
+    /**
+     * Get the singleton instance of Frame
+     *
+     * @return Frame instance
+     */
+    public Frame getFrame() {
+        return Frame.getFrameSingleton();
     }
 }
