@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import fr.sandro642.orbit.Orbit;
 import fr.sandro642.orbit.update.Version;
-import fr.sandro642.orbit.update.ui.Frame;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -23,13 +22,14 @@ public class Updater {
 
     private static final Updater INSTANCE = new Updater();
 
-    public int statusBarProgress = 0;
-
     public void checkForUpdates() {
         try {
-            statusBarProgress = 1;
-
             Orbit.getInstance().getFrame().init();
+
+            Orbit.getInstance().getFrame().textComponent("Vérification des mises à jour...");
+            Orbit.getInstance().getFrame().ProgressValue(1);
+
+            Thread.sleep(1000);
 
             Class<?> classReference = Updater.class;
 
@@ -40,14 +40,9 @@ public class Updater {
 
             if (isLatestVersion()) {
                 downloadFile("https://raw.githubusercontent.com/Sandro642/sandro642.github.io/main/orbit/jar/fr/sandro642/orbit/Orbit/" + fetchVersion() + "/Orbit-" + fetchVersion() + "-fat.jar", FolderParent.toString() + "/Orbit-" + fetchVersion() + ".jar");
-
                 removeAndStartNewVersion();
             } else {
-                statusBarProgress = 5;
-
-                Orbit.getInstance().getLogger().INFO("Fermeture.");
-
-                Thread.sleep(200000);
+                Orbit.getInstance().getFrame().kill();
             }
 
         } catch (Exception exception) {
@@ -59,7 +54,8 @@ public class Updater {
         try {
             final String API_URL = "https://api.github.com/repos/Sandro642/Orbit/tags";
 
-            statusBarProgress = 2;
+            //final String authorizationHeader = "Bearer " + TOKEN;
+            Thread.sleep(1000);
 
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
@@ -86,24 +82,35 @@ public class Updater {
     }
 
     private boolean isLatestVersion() {
-        String ORBIT = "\u001B[94m[Orbit] \u001B[0m";
-        String fetchedVersion = fetchVersion();
+        try {
+            String ORBIT = "\u001B[94m[Orbit] \u001B[0m";
+            String fetchedVersion = fetchVersion();
 
-        if (!fetchedVersion.equals(Version.VERSION)) {
-            Orbit.getInstance().getLogger().INFO(ORBIT + "A new version is available: " + fetchedVersion + " (You are using " + Version.VERSION + ")");
-            statusBarProgress = 3;
+            if (!fetchedVersion.equals(Version.VERSION)) {
+                Orbit.getInstance().getLogger().INFO(ORBIT + "A new version is available: " + fetchedVersion + " (You are using " + Version.VERSION + ")");
 
-            return true;
-        } else {
-            Orbit.getInstance().getLogger().INFO(ORBIT + "You are using the latest version: " + Version.VERSION);
+                Orbit.getInstance().getFrame().textComponent("Nouvelle version disponible: " + fetchedVersion);
+                Orbit.getInstance().getFrame().ProgressValue(3);
+                Thread.sleep(1000);
 
-            return false;
+                return true;
+            } else {
+                Orbit.getInstance().getLogger().INFO(ORBIT + "You are using the latest version: " + Version.VERSION);
+
+                return false;
+            }
+
+        } catch (Exception exception) {
+            Orbit.getInstance().getLogger().ERROR(exception.getMessage());
         }
+        return false;
     }
 
     private void downloadFile(String urlStr, String filePath) {
         try {
-            statusBarProgress = 4;
+            Orbit.getInstance().getFrame().textComponent("Téléchargement de la nouvelle version...");
+            Orbit.getInstance().getFrame().ProgressValue(4);
+            Thread.sleep(1000);
 
             URL url = new URL(urlStr);
 
@@ -127,11 +134,13 @@ public class Updater {
 
             System.out.println("File downloaded successfully: " + downloadedFile.length() + " bytes");
 
+            Orbit.getInstance().getFrame().textComponent("Téléchargement terminé avec succès.");
+            Orbit.getInstance().getFrame().ProgressValue(4);
+
         } catch (Exception exception) {
             exception.printStackTrace();
             Orbit.getInstance().getLogger().ERROR("Download error: " + exception.getMessage());
 
-            // Supprimer le fichier corrompu s'il existe
             File file = new File(filePath);
             if (file.exists()) {
                 file.delete();
@@ -141,7 +150,10 @@ public class Updater {
 
     private void removeAndStartNewVersion() {
         try {
-            statusBarProgress = 5;
+
+            Orbit.getInstance().getFrame().textComponent("Lancement de la nouvelle version...");
+            Orbit.getInstance().getFrame().ProgressValue(5);
+            Thread.sleep(1000);
 
             Class<?> classReference = Updater.class;
 
@@ -166,16 +178,19 @@ public class Updater {
                     LOCAL_JAR.getAbsolutePath()
             );
 
-            // IMPORTANT : Rediriger les sorties pour voir les erreurs
             pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
             pb.redirectError(ProcessBuilder.Redirect.INHERIT);
 
             Process process = pb.start();
 
-            // Attendre un peu et vérifier si le processus tourne toujours
             Thread.sleep(2000);
 
             if (process.isAlive()) {
+
+                Orbit.getInstance().getFrame().textComponent("Fermeture de Orbit Updater...");
+                Orbit.getInstance().getFrame().ProgressValue(5);
+                Thread.sleep(1000);
+
                 System.out.println("New version is running successfully!");
                 System.exit(0);
             } else {
