@@ -41,8 +41,6 @@ public class Updater {
             if (isLatestVersion()) {
                 downloadFile("https://raw.githubusercontent.com/Sandro642/sandro642.github.io/main/orbit/jar/fr/sandro642/orbit/Orbit/" + fetchVersion() + "/Orbit-" + fetchVersion() + "-fat.jar", FolderParent.toString() + "/Orbit-" + fetchVersion() + ".jar");
                 removeAndStartNewVersion();
-            } else {
-                Orbit.getInstance().getFrame().kill();
             }
 
         } catch (Exception exception) {
@@ -97,7 +95,12 @@ public class Updater {
             } else {
                 Orbit.getInstance().getLogger().INFO(ORBIT + "You are using the latest version: " + Version.VERSION);
 
-                return false;
+                Orbit.getInstance().getFrame().textComponent("Vous utilisez la dernière version.");
+                Orbit.getInstance().getFrame().ProgressValue(5);
+                Thread.sleep(1000);
+                Orbit.getInstance().getFrame().textComponent("Lancement de Orbit...");
+
+                Orbit.getInstance().getFrame().kill();
             }
 
         } catch (Exception exception) {

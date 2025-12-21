@@ -119,7 +119,7 @@ public class Frame extends JFrame {
     }
 
     public void kill() {
-        dispose();
+        SwingUtilities.invokeLater(this::dispose);
     }
 
     public static Frame getFrameSingleton() {
