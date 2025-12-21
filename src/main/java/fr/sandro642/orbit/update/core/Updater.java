@@ -101,6 +101,7 @@ public class Updater {
                 Orbit.getInstance().getFrame().textComponent("Lancement de Orbit...");
 
                 Orbit.getInstance().getFrame().kill();
+                System.exit(1);
             }
 
         } catch (Exception exception) {
