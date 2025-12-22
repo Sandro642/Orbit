@@ -1,10 +1,13 @@
 package fr.sandro642.orbit;
 
+import fr.sandro642.orbit.app.ui.MainFrame;
 import fr.sandro642.orbit.log.Logger;
 import fr.sandro642.orbit.log.Logs;
+import fr.sandro642.orbit.repository.DatabaseManager;
 import fr.sandro642.orbit.update.core.Updater;
 import fr.sandro642.orbit.update.ui.Frame;
 
+import javax.swing.*;
 import java.io.File;
 
 public class Orbit extends OrbitHelper {

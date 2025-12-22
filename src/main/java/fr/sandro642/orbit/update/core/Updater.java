@@ -3,8 +3,11 @@ package fr.sandro642.orbit.update.core;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import fr.sandro642.orbit.Orbit;
+import fr.sandro642.orbit.app.ui.MainFrame;
+import fr.sandro642.orbit.repository.DatabaseManager;
 import fr.sandro642.orbit.update.Version;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -101,7 +104,12 @@ public class Updater {
                 Orbit.getInstance().getFrame().textComponent("Lancement de Orbit...");
 
                 Orbit.getInstance().getFrame().kill();
-                System.exit(1);
+
+                new DatabaseManager().init();
+                SwingUtilities.invokeLater(() -> new MainFrame().setVisible(true));
+
+
+                //System.exit(1);
             }
 
         } catch (Exception exception) {
